@@ -6,81 +6,99 @@ class Program
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-        
-        Console.WriteLine("Tic Tac Toe\n" +
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.Write("Tic-");
+        Console.ForegroundColor = ConsoleColor.Blue;
+        Console.Write("tac-");
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.Write("toe\n");
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine("" +
                           "\nControls (set English):" +
                           "\n wasd - select cell" +
-                          "\n h - hide selection (press any key to show)" +
                           "\n e - place figure" +
                           "\n q - quit" +
-                          "\n\nPress anu key to continue...");
+                          "\n\nPress any key to continue...");
         Console.ReadKey();
         
         start:
+        Console.ForegroundColor = ConsoleColor.Red;
         
-        // small part of code made for future if I will decide to make Player vs AI
-        
-        Console.CursorVisible = false;
-        //Console.WriteLine("Circle or Cross?");
-        string choice;
-        //string input = Console.ReadLine();
-        string input = "cross";
+        // basic variables 
         int y = 0;
         int x = 0;
-        bool hide = false;
         int actCount = 0;
+        string choice = "cross";
+        int[,] field = new int[3, 3];
         
-        switch (input)
-        {
-            case "circle":
-            case "1":
-                choice = "circle";
-                Console.ForegroundColor = ConsoleColor.Blue;
-                break;
-            case "cross":
-            case "2":
-                choice = "cross";
-                Console.ForegroundColor = ConsoleColor.Red;
-                break;
-            default:
-                Console.WriteLine("Invalid input");
-                goto start;
-        }
-        // 3d array
-        // 1st matrix-layer has positions of figures
-        // 2nd matrix-layer has position of current selection
-        int[,,] field = new int[3, 3, 2];
-        field[y, x, 1] = 3;
+        // winner variables
+        ConsoleColor color = ConsoleColor.White;
+        string endGameText = "Draw";
+        
+
         
         // game 
         while (true)
         {
             Console.Clear();
-            Console.WriteLine($"You are {choice}!");
-            Console.WriteLine(MergeMatrixLayers(field));
             
-            int win = WinCheck(field);
-            if (win == 1)
+            // win check
+            var response = WinCheck(field);
+            int win = response.win;
+            
+            switch (win)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Cross is a winner");
+                case 1:
+                    color = ConsoleColor.Red;
+                    endGameText = "Cross is a winner!";
+                    break;
+                case 2:
+                    color = ConsoleColor.Blue;
+                    endGameText = "Circle is a winner!";
+                    break;
+                default:
+                    if (actCount == 9)
+                    {
+                        win = 3;
+                        color = ConsoleColor.White;
+                        endGameText = "Draw!";
+                    }
+                    break;
+            }
+            if (win != 0)
+            {
+                //Console.WriteLine(winCheckResult);
+                if (win != 3)
+                {
+                    field[response.pos1.y, response.pos1.x] = win + 2;
+                    field[response.pos2.y, response.pos2.x] = win + 2;
+                    field[response.pos3.y, response.pos3.x] = win + 2;
+                }
+                Console.ForegroundColor = color;
+                Console.WriteLine($"End game!");
+                Console.WriteLine(PrintMatrix(field));
+                Console.SetCursorPosition(0, 4);
+                Console.WriteLine(endGameText);
+                Console.WriteLine();
                 break;
             }
-            if (win == 2)
+            // filed print
+            Console.WriteLine($"You are {choice}!");
+            Console.WriteLine(PrintMatrix(field));
+            if (x == 0)
             {
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.WriteLine("Circle is a winner");
-                break;
+                Console.SetCursorPosition(x, y + 1);
             }
-            if (actCount == 9)
+            else
             {
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("Draw");
-                break;
+                Console.SetCursorPosition(2*x, y + 1);
             }
+
+            
+
+            
             bool quit = false;
             var action = Console.ReadKey();
-            field[y, x, 1] = 0;
             
             // controls 
             switch (action.KeyChar)
@@ -97,6 +115,7 @@ class Program
                     if (sureQuit == "q")
                         quit = true;
                     break;
+                // moving
                 case 'w':
                     y--;
                     break;
@@ -109,40 +128,29 @@ class Program
                 case 'd':
                     x++;
                     break;
-                case 'h':
-                    if (!hide)
-                    {
-                        hide = true;
-                        continue;
-                    }
-                        
-
-                    break;
                 // placement
                 case 'e':
                     Console.WriteLine();
-                    if (field[y, x, 0] != 2 && field[y, x, 0] != 1 && hide == false)
+                    if (field[y, x] != 2 && field[y, x] != 1)
                     {
                         if (choice == "cross")
                         {
-                            field[y, x, 0] = 1;
+                            field[y, x] = 1;
                             choice = "circle";
                             Console.ForegroundColor = ConsoleColor.Blue;
                         }
                         else
                         {
-                            field[y, x, 0] = 2;
+                            field[y, x] = 2;
                             choice = "cross";
                             Console.ForegroundColor = ConsoleColor.Red;
                         }
                         actCount++;
-                        hide = true;
                         continue;
                     }
                     break;
             }
             // out of bounds check
-            hide = false;
             if (x < 0)
                 x = 2;
             else if (x > 2)
@@ -151,10 +159,6 @@ class Program
                 y = 2;
             else if (y > 2)
                 y = 0;
-            if (field[y, x, 0] == 0)
-                field[y, x, 1] = 3;
-            else
-                field[y, x, 1] = 4;
             
             Console.WriteLine();
             if (quit)
@@ -163,16 +167,12 @@ class Program
             }
         }
         // ask for rematch
+        Console.ForegroundColor = ConsoleColor.White;
         reansw:
-        Console.CursorVisible = true;
-        
         Console.WriteLine("Want to rematch?" +
                           "\nyes - rematch" +
                           "\nno - quit");
         string rematchAnswer = Console.ReadLine();
-        
-        Console.CursorVisible = false;
-        
         switch (rematchAnswer)
         {
             case "y":
@@ -188,99 +188,73 @@ class Program
                 goto reansw;
         }
     }
-    // algorithm for c if there are 3 in row/col/diagonal, just check for win
-    static int WinCheck(int[,,] matrix)
+    
+    // algorithm of checking if there are 3 in line
+    static ((int y, int x) pos1, (int y, int x) pos2, (int y, int x) pos3, int win) WinCheck(int[,] matrix) 
     {
         int win = 0;
-        int k = 0;
-        int[] arr = new int[24];
-
+        // rows check
         for (int i = 0; i < 3; i++)
         {
-            for (int j = 0; j < 3; j++)
+            if (matrix[i, 0] == matrix[i, 1] && matrix[i, 0] == matrix[i, 2] &&
+                matrix[i, 0] != 0)
             {
-                arr[k] = matrix[i, j, 0];
-                k++;
+                win = matrix[i, 0];
+                return ((i, 0), (i, 1), (i, 2), win);
             }
         }
+        // columns check
         for (int i = 0; i < 3; i++)
         {
-            for (int j = 0; j < 3; j++)
+            if (matrix[0, i] == matrix[1, i] && matrix[0, i] == matrix[2, i] &&
+                matrix[0, i] != 0)
             {
-                arr[k] = matrix[j, i, 0];
-                k++;
+                win = matrix[0, i];
+                return ((0, i), (1, i), (2, i), win);
             }
         }
-        int ii = 0, jj = 0;
-        for (k = k; k < 21; k++)
+        // main diagonal check
+        if (matrix[0, 0] == matrix[1, 1] && matrix[0, 0] == matrix[2, 2] &&
+            matrix[0, 0] != 0)
         {
-            arr[k] = matrix[ii, jj, 0];
-            ii++;
-            jj++;
+            win = matrix[0, 0];
+            return ((0, 0), (1, 1), (2, 2), win);
         }
-
-        ii = 2;
-        jj = 0;
-        for (k = k; k < 24; k++)
+        // off diagonal check
+        if (matrix[2, 0] == matrix[1, 1] && matrix[2, 0] == matrix[0, 2] &&
+            matrix[2, 0] != 0)
         {
-            arr[k] = matrix[ii, jj, 0];
-            ii--;
-            jj++;
+            win = matrix[2, 0];
+            return ((2, 0), (1, 1), (0, 2), win);
         }
         
-        for (int i = 0; i < arr.Length; i += 3)
-        {
-            // Console.WriteLine($"({arr[i]}, {arr[i + 1]}, {arr[i + 2]})");
-            if (arr[i] == arr[i + 1] && arr[i] == arr[i + 2] && arr[i] != 0)
-            {
-                win = arr[i];
-                break;
-            }
-        }
-        
-        return win;
+        return ((0, 0), (0, 0), (0, 0), win);
     }
-    
-    // merge matrix-layers
-    static string MergeMatrixLayers(int[,,] matrix)
-    {
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                int element = matrix[i, j, 1];
-                if (element == 3 || element == 4)
-                    matrix[i, j, 1] = matrix[i, j, 1];
-                else
-                    matrix[i, j, 1] = matrix[i, j, 0];
-            }
-        }
-        return PrintMatrix(matrix);
-    }
+   
     
     // Visualisation of field
-    static string PrintMatrix(int[,,] matrix)
+    static string PrintMatrix(int[,] matrix)
     {
         string result = "";
         for (int i = 0; i < 3; i++)
         {
             for (int j = 0; j < 3; j++)
             {
-                // ⎕ █ ✕ ⊗ ◯ ●
-                int element = matrix[i, j, 1];
-                string interpratate = "";
+                // ⎕ █ ✗ ⊞ ◯ ●
+                int element = matrix[i, j];
+                string interpreter = "";
                 if (element == 0)
-                    interpratate = "\u22c5";
+                    interpreter = "\u22c5";
                 else if (element == 1)
-                    interpratate = "\u2715";
+                    interpreter = "\u2717";
                 else if (element == 2)
-                    interpratate = "\u25ef";
+                    interpreter = "\u25ef";
                 else if (element == 3)
-                    interpratate = "\u2588";
+                    interpreter = "\u229e";
                 else if (element == 4)
-                    interpratate = "\u2395";
+                    interpreter = "\u25cf";
                 
-                result += interpratate + " ";
+                result += interpreter + " ";
             }
             result += "\n";
         }
