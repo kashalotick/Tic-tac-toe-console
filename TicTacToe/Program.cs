@@ -14,10 +14,10 @@ class Program
         Console.Write("toe\n");
         Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine("" +
-                          "\nControls (set English):" +
-                          "\n wasd - select cell" +
-                          "\n e - place figure" +
-                          "\n q - quit" +
+                          "\nControls (set English language):" +
+                          "\n   wasd - select cell" +
+                          "\n   e - place figure" +
+                          "\n   q - quit" +
                           "\n\nPress any key to continue...");
         Console.ReadKey();
         
@@ -108,9 +108,7 @@ class Program
                     Console.SetCursorPosition(0, 4);
                     Console.WriteLine("Sure to quit? (q to quit)");
                     
-                    Console.CursorVisible = true;
                     string sureQuit = Console.ReadLine();
-                    Console.CursorVisible = false;
                     
                     if (sureQuit == "q")
                         quit = true;
@@ -240,17 +238,17 @@ class Program
         {
             for (int j = 0; j < 3; j++)
             {
-                // ⎕ █ ✗ ⊞ ◯ ●
+                // ∙  ✕|✗ ⊠|⊞   ◯ ● 
                 int element = matrix[i, j];
                 string interpreter = "";
                 if (element == 0)
-                    interpreter = "\u22c5";
+                    interpreter = "\u2219";
                 else if (element == 1)
-                    interpreter = "\u2717";
+                    interpreter = "\u2715";
                 else if (element == 2)
                     interpreter = "\u25ef";
                 else if (element == 3)
-                    interpreter = "\u229e";
+                    interpreter = "\u22a0";
                 else if (element == 4)
                     interpreter = "\u25cf";
                 

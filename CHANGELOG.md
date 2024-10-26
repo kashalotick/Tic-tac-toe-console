@@ -1,4 +1,11 @@
-## 26.10.2024
+## 26.10.2024 v0.2
+
+### General changes
+* Fixed issue: after refusing to quit cursor was hidden
+* Changed some symbols
+* Changed welcome description 
+
+## 26.10.2024 v0.2
 
 ### General changes
 * Visual changes
@@ -17,7 +24,7 @@
 * Changed selection: symbols -> cursor
 * Some code optimization and improvements
 
-## 25.10.2024
+## 25.10.2024 v0.1
 
 ### General changes
 * Visualisation is done
@@ -33,5 +40,5 @@
 * Created asking for rematch
 * Created controls
 
-## 24.10.2024
+## 24.10.2024 v0.0
 * Initialization
